@@ -55,7 +55,45 @@ function closeMobile() {
 }
 
 // ============ PAGE ROUTING ============
-function showPage(pageId, extra) {
+// Helper to get base path (supports subdirectory installs, e.g. /algoace/)
+function getBasePath() {
+    const path = window.location.pathname;
+    const parts = path.split('/');
+    if (parts[parts.length - 1] !== '') {
+        parts.pop();
+    }
+    let base = parts.join('/');
+    if (!base.endsWith('/')) base += '/';
+    return base;
+}
+
+// Map internal page state to a "pretty" path
+function getPathForState(pageId, extra) {
+    const base = getBasePath();
+    let slug = '';
+    switch (pageId) {
+        case 'home':
+            slug = '';
+            break;
+        case 'about':
+        case 'services':
+        case 'blog':
+        case 'contact':
+            slug = pageId;
+            break;
+        case 'service-detail':
+            slug = 'services' + (extra ? '/' + extra : '');
+            break;
+        case 'blog-detail':
+            slug = 'blog' + (extra ? '/' + extra : '');
+            break;
+        default:
+            slug = '';
+    }
+    return base + slug;
+}
+
+function showPage(pageId, extra, skipPush) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     const target = document.getElementById('page-' + pageId);
     if (target) {
@@ -76,6 +114,54 @@ function showPage(pageId, extra) {
     setTimeout(initReveal, 100);
     setTimeout(initCounters, 200);
     setTimeout(initSkillBars, 300);
+
+    // Update browser URL using History API for pretty slugs (e.g. /about instead of /#about)
+    if (!skipPush && window.history && window.history.pushState) {
+        const newPath = getPathForState(pageId, extra);
+        const current = window.location.pathname;
+        if (current !== newPath) {
+            window.history.pushState({ pageId, extra }, '', newPath);
+        }
+    }
+}
+
+// Handle back/forward navigation via path (pretty URLs)
+function handlePathNavigation() {
+    const base = getBasePath();
+    let rel = window.location.pathname;
+    if (rel.startsWith(base)) {
+        rel = rel.slice(base.length);
+    }
+    rel = rel.replace(/^\/+|\/+$/g, '');
+
+    if (!rel) {
+        showPage('home', null, true);
+        return;
+    }
+
+    const parts = rel.split('/');
+    const slug = parts[0] || '';
+    const extra = parts[1] || null;
+
+    let pageId = 'home';
+    switch (slug) {
+        case 'about':
+            pageId = 'about';
+            break;
+        case 'services':
+            pageId = extra ? 'service-detail' : 'services';
+            break;
+        case 'blog':
+            pageId = extra ? 'blog-detail' : 'blog';
+            break;
+        case 'contact':
+            pageId = 'contact';
+            break;
+        default:
+            pageId = 'home';
+    }
+
+    showPage(pageId, extra, true);
 }
 
 // ============ REVEAL ON SCROLL ============
@@ -335,6 +421,7 @@ const serviceData = {
         ]
     }
 };
+
 function loadServiceDetail(key) {
     const d = serviceData[key] || serviceData.web;
     document.getElementById('sd-emoji').textContent = d.emoji;
@@ -517,6 +604,8 @@ function loadBlogDetail(key) {
 window.addEventListener('load', () => {
     initReveal();
     initCounters();
+    // Navigate based on current path (or default to home)
+    handlePathNavigation();
     // run initial reveal after a moment
     setTimeout(() => {
         document.querySelectorAll('#page-home .reveal, #page-home .reveal-left, #page-home .reveal-right').forEach(el => {
@@ -525,6 +614,9 @@ window.addEventListener('load', () => {
         });
     }, 300);
 });
+
+// React to back/forward buttons
+window.addEventListener('popstate', handlePathNavigation);
 
 // Add intersection observer for scroll-based reveals
 const globalObserver = new IntersectionObserver((entries) => {

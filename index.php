@@ -9,6 +9,7 @@
         href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="<?php echo get_stylesheet_uri(); ?>">
+    <?php wp_head(); ?>
 </head>
 
 <body>
@@ -1174,7 +1175,7 @@
             <p style="color:var(--text2);font-size:0.82rem;">Web · AI · Mobile · The Future</p>
         </div>
     </footer>
-    <script src="./script.js"></script>
+    <?php wp_footer(); ?>
 </body>
 
 </html>

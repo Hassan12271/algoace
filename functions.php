@@ -7,7 +7,7 @@ function my_theme_scripts()
     // JS
     wp_enqueue_script(
         'main-js', // handle
-        get_template_directory_uri() . 'script.js', // path
+        get_template_directory_uri() . '/script.js', // path
         array(), // dependencies
         '1.0', // version
         true // load in footer
