@@ -3,6 +3,13 @@ Theme Name: algoace
 Author: Hassan Raza
 Version: 1.0
 */
+@font-face {
+    font-family: 'Gotham Black';
+    src: url('assets/fonts/Gotham%20Black.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 :root {
     --bg: #030712;
     --bg2: #0a0f1e;
@@ -15,8 +22,9 @@ Version: 1.0
     --text2: #94a3b8;
     --border: rgba(0, 245, 212, 0.12);
     --glow: 0 0 40px rgba(0, 245, 212, 0.15);
-    --font-head: 'Syne', sans-serif;
+    --font-head: 'montserrat', sans-serif;
     --font-body: 'DM Sans', sans-serif;
+    --font-logo:"Gotham Black", sans-serif;
 }
 
 * {
@@ -139,7 +147,7 @@ header.scrolled {
 }
 
 .logo {
-    font-family: var(--font-head);
+    font-family: var(--font-logo);
     font-size: 1.6rem;
     font-weight: 800;
     letter-spacing: -0.5px;
@@ -148,10 +156,12 @@ header.scrolled {
     gap: 4px;
     cursor: pointer;
     text-decoration: none;
+    text-transform: uppercase;
 }
 
 .logo span.accent {
     color: var(--accent);
+    margin-left: -3px;
 }
 
 .logo-mark {
